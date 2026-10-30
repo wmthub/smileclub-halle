@@ -20,8 +20,8 @@
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/inter-tight-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/fonts.css?v=ig916">
-<link rel="stylesheet" href="/assets/site.css?v=ig916">
+<link rel="stylesheet" href="/assets/fonts.css?v=perf1">
+<link rel="stylesheet" href="/assets/site.css?v=perf1">
 </head>
 <body id="top">
 <a class="skip" href="#inhalt">Zum Inhalt springen</a>
@@ -114,7 +114,7 @@ document.querySelectorAll('.faq-item').forEach(function(item){
     items.slice(0,6).forEach(function(it){
       var a=document.createElement('a'); a.className='tile'; a.href=it.href; a.setAttribute('aria-label','Instagram-Beitrag öffnen: '+it.alt);
       var inner=document.createElement('span'); inner.className='tile-in';
-      var img=document.createElement('img'); img.src=it.src; img.alt=it.alt; img.loading='lazy'; img.width=640; img.height=640;
+      var img=document.createElement('img'); img.src=it.src; img.alt=it.alt; img.loading='lazy'; img.decoding='async'; img.width=640; img.height=640;
       inner.appendChild(img); a.appendChild(inner);
       var ov=document.createElement('span'); ov.className='tile-ov'; ov.setAttribute('aria-hidden','true');
       var svg=document.createElementNS(NS,'svg'); svg.setAttribute('width','30'); svg.setAttribute('height','30'); svg.setAttribute('viewBox','0 0 24 24'); svg.setAttribute('fill','none'); svg.setAttribute('stroke','currentColor'); svg.setAttribute('stroke-width','1.6');

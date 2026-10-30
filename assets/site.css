@@ -56,7 +56,7 @@ img{max-width:100%}
 
 /* Laufband */
 .marquee{background:var(--sand);color:var(--ink);overflow:hidden;padding:22px 0;border-top:1.5px solid var(--ink);border-bottom:1.5px solid var(--ink)}
-.marquee-track{display:flex;width:max-content;animation:marq 26s linear infinite;font-weight:800;font-size:44px;letter-spacing:-.03em;white-space:nowrap}
+.marquee-track{display:flex;width:max-content;will-change:transform;animation:marq 26s linear infinite;font-weight:800;font-size:44px;letter-spacing:-.03em;white-space:nowrap}
 .marquee:hover .marquee-track{animation-play-state:paused}
 .marquee-group{display:flex;align-items:center;gap:48px;padding-right:48px}
 .sq{display:inline-block;width:14px;height:14px;background:var(--ink)}
@@ -110,7 +110,7 @@ img{max-width:100%}
 .rv{animation:rvIn linear both;animation-timeline:view();animation-range:entry 0% cover 28%}
 @keyframes rvIn{from{opacity:0;transform:translateY(56px)}to{opacity:1;transform:none}}
 .wm-foot{animation:wmScale linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
-@keyframes wmScale{from{transform:translateY(30%);letter-spacing:.04em}to{transform:none;letter-spacing:-.035em}}
+@keyframes wmScale{from{transform:translateY(30%) scale(1.06)}to{transform:none}}
 }
 @media (max-width:760px){
 .nav{padding:24px 20px}
