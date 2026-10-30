@@ -22,6 +22,10 @@ img{max-width:100%}
 .btn-ghost:hover::before{transform:translateY(0)}
 .btn-ghost:hover{color:var(--ink);border-color:var(--cream)}
 .btn-ghost span{position:relative;z-index:1}
+.btn-wa{padding:0 22px 0 18px;gap:10px;background:var(--sand);color:var(--ink)}
+.btn-wa::before{content:"";position:absolute;inset:0;background:var(--cream);border-radius:inherit;transform:translateY(102%);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.btn-wa:hover::before{transform:translateY(0)}
+.btn-wa span{position:relative;z-index:1}
 .btn-dark{height:58px;padding:0 8px 0 24px;background:var(--ink);color:var(--cream)}
 .btn-dark .arr{width:42px;height:42px;background:var(--sand);color:var(--ink)}
 .btn-dark:hover{background:#2A333E}
