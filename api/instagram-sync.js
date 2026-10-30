@@ -16,8 +16,11 @@ export async function GET() {
     return json({ ok: true, skipped: 'zu kurz nach dem letzten Abruf' });
   }
 
+  // Variante ohne eigene Meta-App: Behold-JSON-Feed (nur Instagram-Login nötig)
+  if (process.env.BEHOLD_FEED_URL) return syncBehold(now);
+
   let token = state.token || process.env.INSTAGRAM_TOKEN;
-  if (!token) return json({ ok: false, error: 'INSTAGRAM_TOKEN fehlt' }, 503);
+  if (!token) return json({ ok: false, error: 'INSTAGRAM_TOKEN oder BEHOLD_FEED_URL fehlt' }, 503);
 
   // Langlebigen Schlüssel regelmäßig verlängern (gilt sonst 60 Tage)
   if (!state.refreshedAt || now - state.refreshedAt > REFRESH_AFTER_MS) {
@@ -66,4 +69,43 @@ export async function GET() {
   await writeJson(STATE, { token, refreshedAt: state.refreshedAt, syncedAt: now, lastError: null });
 
   return json({ ok: true, count: items.length });
+}
+
+async function storeImage(id, src) {
+  const img = await fetch(src);
+  if (!img.ok) return false;
+  await put(imgPath(id), Buffer.from(await img.arrayBuffer()), {
+    access: 'private',
+    contentType: img.headers.get('content-type') || 'image/jpeg',
+    addRandomSuffix: false,
+    allowOverwrite: true,
+  });
+  return true;
+}
+
+async function syncBehold(now) {
+  const res = await fetch(process.env.BEHOLD_FEED_URL);
+  if (!res.ok) {
+    await writeJson(STATE, { syncedAt: now, lastError: `Behold ${res.status}` });
+    return json({ ok: false, error: `Behold ${res.status}` }, 502);
+  }
+  const { posts = [] } = await res.json();
+  const items = [];
+  for (const p of posts) {
+    if (items.length >= COUNT) break;
+    const id = String(p.id || '').replace(/\D/g, '');
+    const src = p.sizes?.medium?.mediaUrl || p.thumbnailUrl || (p.mediaType !== 'VIDEO' ? p.mediaUrl : null);
+    if (!id || !src || !(await storeImage(id, src))) continue;
+    const caption = (p.altText || p.prunedCaption || p.caption || '').replace(/\s+/g, ' ').trim();
+    items.push({
+      id,
+      permalink: p.permalink,
+      alt: caption ? caption.slice(0, 120) : 'Instagram-Beitrag von Smile Club',
+      video: p.mediaType === 'VIDEO',
+      timestamp: p.timestamp,
+    });
+  }
+  await writeJson(FEED, { updatedAt: new Date(now).toISOString(), items });
+  await writeJson(STATE, { syncedAt: now, lastError: null, source: 'behold' });
+  return json({ ok: true, count: items.length, source: 'behold' });
 }
