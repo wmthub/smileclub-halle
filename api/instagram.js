@@ -9,5 +9,7 @@ export async function GET() {
     alt: i.alt,
     video: i.video,
   }));
-  return json({ items }, 200, 'public, max-age=0, s-maxage=900, stale-while-revalidate=86400');
+  // Leere Liste nicht zwischenspeichern, damit neue Beiträge sofort sichtbar werden
+  const cache = items.length ? 'public, max-age=0, s-maxage=900, stale-while-revalidate=86400' : 'no-store';
+  return json({ items }, 200, cache);
 }
