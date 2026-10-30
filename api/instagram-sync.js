@@ -20,7 +20,8 @@ export async function GET() {
   if (process.env.BEHOLD_FEED_URL) return syncBehold(now);
 
   let token = state.token || process.env.INSTAGRAM_TOKEN;
-  if (!token) return json({ ok: false, error: 'INSTAGRAM_TOKEN oder BEHOLD_FEED_URL fehlt' }, 503);
+  // Ohne Schlüssel: eigene Lösung über das öffentliche Profil (kein Facebook, kein Drittanbieter)
+  if (!token) return syncPublic(now, process.env.INSTAGRAM_USERNAME || 'smileclub.halle');
 
   // Langlebigen Schlüssel regelmäßig verlängern (gilt sonst 60 Tage)
   if (!state.refreshedAt || now - state.refreshedAt > REFRESH_AFTER_MS) {
@@ -108,4 +109,73 @@ async function syncBehold(now) {
   await writeJson(FEED, { updatedAt: new Date(now).toISOString(), items });
   await writeJson(STATE, { syncedAt: now, lastError: null, source: 'behold' });
   return json({ ok: true, count: items.length, source: 'behold' });
+}
+
+// --- Öffentliches Profil -------------------------------------------------
+const UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36';
+
+async function fetchProfile(username) {
+  const tries = [];
+  // 1) Web-Schnittstelle, die auch instagram.com selbst nutzt
+  try {
+    const r = await fetch(`https://www.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(username)}`, {
+      headers: {
+        'User-Agent': UA,
+        'Accept': '*/*',
+        'Accept-Language': 'de-DE,de;q=0.9',
+        'X-IG-App-ID': '936619743392459',
+        'X-Requested-With': 'XMLHttpRequest',
+        'Referer': `https://www.instagram.com/${username}/`,
+      },
+    });
+    const text = await r.text();
+    tries.push({ src: 'web_profile_info', status: r.status, head: text.slice(0, 200) });
+    if (r.ok) {
+      const edges = JSON.parse(text)?.data?.user?.edge_owner_to_timeline_media?.edges || [];
+      if (edges.length) {
+        return {
+          posts: edges.map(({ node: n }) => ({
+            id: String(n.id),
+            permalink: `https://www.instagram.com/p/${n.shortcode}/`,
+            src: n.display_url || n.thumbnail_src,
+            caption: n.accessibility_caption || n.edge_media_to_caption?.edges?.[0]?.node?.text || '',
+            video: !!n.is_video,
+            timestamp: n.taken_at_timestamp ? new Date(n.taken_at_timestamp * 1000).toISOString() : null,
+          })),
+          tries,
+        };
+      }
+    }
+  } catch (e) {
+    tries.push({ src: 'web_profile_info', error: String(e) });
+  }
+  return { posts: [], tries };
+}
+
+async function syncPublic(now, username) {
+  const state = (await readJson(STATE)) || {};
+  if (state.attemptAt && now - state.attemptAt < 2 * 60 * 1000) {
+    return json({ ok: false, skipped: 'Versuch läuft bereits' }, 429);
+  }
+  const { posts, tries } = await fetchProfile(username);
+  if (!posts.length) {
+    await writeJson(STATE, { ...state, attemptAt: now, lastError: 'Profil nicht abrufbar', tries });
+    return json({ ok: false, error: 'Profil nicht abrufbar', tries }, 502);
+  }
+  const items = [];
+  for (const p of posts) {
+    if (items.length >= COUNT) break;
+    if (!/^[0-9]{5,30}$/.test(p.id) || !p.src || !(await storeImage(p.id, p.src))) continue;
+    const caption = p.caption.replace(/\s+/g, ' ').trim();
+    items.push({
+      id: p.id,
+      permalink: p.permalink,
+      alt: caption ? caption.slice(0, 120) : 'Instagram-Beitrag von Smile Club',
+      video: p.video,
+      timestamp: p.timestamp,
+    });
+  }
+  await writeJson(FEED, { updatedAt: new Date(now).toISOString(), items });
+  await writeJson(STATE, { syncedAt: now, attemptAt: now, lastError: null, source: 'public' });
+  return json({ ok: true, count: items.length, source: 'public' });
 }
