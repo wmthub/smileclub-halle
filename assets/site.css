@@ -112,6 +112,8 @@ img{max-width:100%}
 .wm-foot{animation:wmScale linear both;animation-timeline:view();animation-range:entry 0% cover 45%}
 @keyframes wmScale{from{transform:translateY(30%) scale(1.06)}to{transform:none}}
 }
+/* Spalten untereinander: linke Spalte nicht mitlaufen lassen */
+@media (max-width:1100px){.faq-side{position:static}}
 @media (max-width:760px){
 .nav{padding:24px 20px}
 .nav-links{display:none}
