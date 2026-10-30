@@ -1,0 +1,9 @@
+{
+  "name": "smileclub-halle",
+  "private": true,
+  "type": "module",
+  "description": "Website Smile Club Halle – statische Seite + Instagram-Feed über Vercel Functions",
+  "dependencies": {
+    "@vercel/blob": "^2.8.2"
+  }
+}
