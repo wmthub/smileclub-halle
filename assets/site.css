@@ -88,7 +88,7 @@ img{max-width:100%}
 .ig-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:32px 48px;padding:0 48px 72px;max-width:1456px;margin:0 auto}
 .ig-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;padding:0 8px}
 .ig-grid .tile:nth-child(even){transform:translateY(48px)}
-.tile{position:relative;display:block;aspect-ratio:1/1;overflow:hidden;text-decoration:none}
+.tile{position:relative;display:block;aspect-ratio:9/16;overflow:hidden;text-decoration:none}
 .tile-in{position:absolute;inset:0;display:grid;place-items:center;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
 .tile-in img{width:100%;height:100%;object-fit:cover;display:block}
 .tile:hover .tile-in{transform:scale(1.08)}
