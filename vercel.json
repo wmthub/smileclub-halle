@@ -11,6 +11,12 @@
       "has": [{ "type": "host", "value": "(www\\.)?smileclub-halle\\.com" }],
       "destination": "https://www.smileclub-halle.de/:path*",
       "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "smileclub-halle-v2(-wmthub)?\\.vercel\\.app" }],
+      "destination": "https://www.smileclub-halle.de/:path*",
+      "permanent": true
     }
   ],
   "headers": [
