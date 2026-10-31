@@ -1,21 +1,63 @@
 {
   "cleanUrls": true,
-  "crons": [{ "path": "/api/instagram-sync", "schedule": "17 5 * * *" }],
+  "crons": [
+    {
+      "path": "/api/instagram-sync",
+      "schedule": "17 5 * * *"
+    }
+  ],
   "trailingSlash": false,
   "redirects": [
-    { "source": "/privacy-policy", "destination": "/impressum", "permanent": true },
-    { "source": "/privacy-policy-1", "destination": "/datenschutz", "permanent": true },
-    { "source": "/privacy-policy-1-1", "destination": "/agb", "permanent": true },
-    { "source": "/index", "destination": "/", "permanent": true },
+    {
+      "source": "/privacy-policy",
+      "destination": "/impressum",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy-1",
+      "destination": "/datenschutz",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy-1-1",
+      "destination": "/agb",
+      "permanent": true
+    },
+    {
+      "source": "/index",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?smileclub-halle\\.com"
+        }
+      ],
+      "destination": "https://www.smileclub-halle.de/",
+      "permanent": true
+    },
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "(www\\.)?smileclub-halle\\.com" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "(www\\.)?smileclub-halle\\.com"
+        }
+      ],
       "destination": "https://www.smileclub-halle.de/:path*",
       "permanent": true
     },
     {
       "source": "/:path((?!api/).*)",
-      "has": [{ "type": "host", "value": "smileclub-halle-v2(-wmthub)?\\.vercel\\.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "smileclub-halle-v2(-wmthub)?\\.vercel\\.app"
+        }
+      ],
       "destination": "https://www.smileclub-halle.de/:path",
       "permanent": true
     }
@@ -24,16 +66,36 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Content-Security-Policy", "value": "frame-ancestors 'self'" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "frame-ancestors 'self'"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        }
       ]
     },
     {
       "source": "/assets/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
   ]
 }
